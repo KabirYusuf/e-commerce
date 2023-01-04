@@ -1,9 +1,10 @@
 package com.kyaa.ecommerce.services;
 
-import com.kyaa.ecommerce.data.dto.requests.*;
-import com.kyaa.ecommerce.data.dto.responses.CreateUserResponse;
-import com.kyaa.ecommerce.data.dto.responses.LoginResponse;
-import com.kyaa.ecommerce.data.models.Cart;
+import com.kyaa.ecommerce.data.models.Address;
+import com.kyaa.ecommerce.dto.requests.*;
+import com.kyaa.ecommerce.dto.responses.AddProductToCartResponse;
+import com.kyaa.ecommerce.dto.responses.CreateUserResponse;
+import com.kyaa.ecommerce.dto.responses.LoginResponse;
 import com.kyaa.ecommerce.data.models.Product;
 import com.kyaa.ecommerce.data.models.User;
 import com.kyaa.ecommerce.data.repositories.UserRepository;
@@ -25,8 +26,6 @@ class UserServicesImplTest {
 @Autowired
 private UserService userService;
 @Autowired
-private UserRepository userRepository;
-@Autowired
 private ProductService productService;
 
 private CreateProductRequest createProductRequest;
@@ -34,10 +33,13 @@ private CreateUserRequest createUserRequest;
 private CreateUserResponse createUserResponse;
     @BeforeEach
     void setUp() {
+        Address address = new Address();
+        address.setTown("Bwari");
         createUserRequest = new CreateUserRequest();
         createUserRequest.setEmail("kabir@gmail.com");
         createUserRequest.setUsername("kyaa");
         createUserRequest.setPassword("pass1234");
+        createUserRequest.setAddress(address);
 
         createProductRequest = new CreateProductRequest();
         createProductRequest.setName("milk");
@@ -47,19 +49,32 @@ private CreateUserResponse createUserResponse;
     }
     @AfterEach
     void afterEach(){
-        userRepository.deleteAll();
+        userService.deleteAllUsers();
+        productService.deleteAllProducts();
     }
 
     @Test
     void userCanBeCreatedAndIdIsGenerated(){
         createUserResponse = userService.createUser(createUserRequest);
-        assertEquals(1L,createUserResponse.getId());
+        assertNotNull(createUserResponse.getId());
     }
     @Test
     void userCanBeFoundByIdTest(){
         createUserResponse = userService.createUser(createUserRequest);
-        Optional<User> foundUser = userService.getUserById(1L);
+        Optional<User> foundUser = userService.getUserById(createUserResponse.getId());
         assertTrue(foundUser.isPresent());
+    }
+    @Test
+    void testThatAddressIsCreatedWhenAUserIsCreated(){
+        createUserResponse = userService.createUser(createUserRequest);
+        Optional<User> foundUser = userService.getUserById(createUserResponse.getId());
+        assertNotNull(foundUser.get().getAddress().getId());
+    }
+    @Test
+    void testThatCartIsCreatedWhenAUserIsCreated(){
+        createUserResponse = userService.createUser(createUserRequest);
+        Optional<User> foundUser = userService.getUserById(createUserResponse.getId());
+        assertNotNull(foundUser.get().getCart().getId());
     }
     @Test
     void userCanBeFoundByUsernameTest(){
@@ -78,7 +93,7 @@ private CreateUserResponse createUserResponse;
         createUserResponse = userService.createUser(createUserRequest);
         var usersBeforeDeleting = userService.getAllUsers();
         assertEquals(1, usersBeforeDeleting.size());
-        userService.deleteUserById(1L);
+        userService.deleteUserById(createUserResponse.getId());
         var usersAfterDeleting = userService.getAllUsers();
         assertEquals(0, usersAfterDeleting.size());
     }
@@ -112,27 +127,57 @@ private CreateUserResponse createUserResponse;
         LoginResponse loginResponse = userService.login(loginRequest);
         assertEquals("login successful", loginResponse.getMessage());
     }
-//    @Test
-//    void userCanAddProductToProductDb(){
-//        createUserResponse = userService.createUser(createUserRequest);
-//        userService.addProduct(createProductRequest, "kyaa");
-//        assertEquals(1, productService.getAllProducts().size());
-//    }
     @Test
     void testThatNumberOfProductsInCartIsEqualToTheNumberOfProductsAddedToCart(){
         createUserResponse = userService.createUser(createUserRequest);
         Optional<User> foundUser = userService.getUserByUsername("kyaa");
-        System.out.println(foundUser.get());
-        System.out.println(foundUser.get().getCart());
-        var numberOfProductsInUserCartBeforeAddingAProduct = foundUser.get().getCart().getProducts().size();
+        var numberOfProductsInUserCartBeforeAddingAProduct = foundUser.get().getCart().getCartProducts().size();
         assertEquals(0, numberOfProductsInUserCartBeforeAddingAProduct);
         productService.createProduct(createProductRequest);
         Optional<Product> foundProduct = productService.getProductByName("milk");
+        System.out.println(productService.getAllProducts().size());
+        System.out.println(productService.getAllProducts().get(0));
+//        System.out.println(foundProduct.get());
         AddProductToCartRequest addProductToCartRequest = new AddProductToCartRequest();
-        addProductToCartRequest.setProduct(foundProduct.get());
+//        addProductToCartRequest.setProduct(foundProduct.get());
+        addProductToCartRequest.setUsername("kyaa");
+        addProductToCartRequest.setProductName("milk");
+        addProductToCartRequest.setQuantity(2);
         userService.addProductToCart(addProductToCartRequest);
-        var numberOfProductsInUserCartAfterAddingAProduct = foundUser.get().getCart().getProducts().size();
+
+        Optional<User> foundUserAfterAddingProductToCart = userService.getUserByUsername("kyaa");
+        System.out.println(foundUserAfterAddingProductToCart.get().getCart());
+        var numberOfProductsInUserCartAfterAddingAProduct = foundUserAfterAddingProductToCart.get().getCart().getCartProducts().size();
         assertEquals(1, numberOfProductsInUserCartAfterAddingAProduct);
+    }
+
+    @Test
+    void testThatNumberOfProductsInAUserCartDecreasesByOneIfAProductIsDeleted(){
+        createUserResponse = userService.createUser(createUserRequest);
+        Optional<User> foundUser = userService.getUserByUsername("kyaa");
+        var numberOfProductsInUserCartBeforeAddingAProduct = foundUser.get().getCart().getCartProducts().size();
+        assertEquals(0, numberOfProductsInUserCartBeforeAddingAProduct);
+        productService.createProduct(createProductRequest);
+        Optional<Product> foundProduct = productService.getProductByName("milk");
+        System.out.println(productService.getAllProducts().size());
+        System.out.println(productService.getAllProducts().get(0));
+//        System.out.println(foundProduct.get());
+        AddProductToCartRequest addProductToCartRequest = new AddProductToCartRequest();
+//        addProductToCartRequest.setProduct(foundProduct.get());
+        addProductToCartRequest.setUsername("kyaa");
+        addProductToCartRequest.setProductName("milk");
+        addProductToCartRequest.setQuantity(2);
+        AddProductToCartResponse addProductToCartResponse = userService.addProductToCart(addProductToCartRequest);
+
+        Optional<User> foundUserAfterAddingProductToCart = userService.getUserByUsername("kyaa");
+        System.out.println(foundUserAfterAddingProductToCart.get().getCart());
+        var numberOfProductsInUserCartAfterAddingAProduct = foundUserAfterAddingProductToCart.get().getCart().getCartProducts().size();
+        assertEquals(1, numberOfProductsInUserCartAfterAddingAProduct);
+
+        userService.deleteProductFromCart(createUserResponse.getUsername(), addProductToCartResponse.getName());
+        Optional<User> foundUserAfterDeletingProductToCart = userService.getUserByUsername("kyaa");
+        var numberOfProductsInUserCartAfterDeletingAProduct = foundUserAfterDeletingProductToCart.get().getCart().getCartProducts().size();
+        assertEquals(0, numberOfProductsInUserCartAfterDeletingAProduct);
     }
 
 }

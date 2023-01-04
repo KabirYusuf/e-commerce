@@ -1,4 +1,4 @@
-package com.kyaa.ecommerce.data.dto.requests;
+package com.kyaa.ecommerce.dto.requests;
 
 import com.kyaa.ecommerce.data.models.Product;
 import lombok.Data;
@@ -6,5 +6,6 @@ import lombok.Data;
 @Data
 public class AddProductToCartRequest {
     private String username;
-    private Product product;
+    private String productName;
+    private Integer quantity;
 }

@@ -1,7 +1,7 @@
 package com.kyaa.ecommerce.services;
 
-import com.kyaa.ecommerce.data.dto.requests.CreateProductRequest;
-import com.kyaa.ecommerce.data.dto.responses.CreateProductResponse;
+import com.kyaa.ecommerce.dto.requests.CreateProductRequest;
+import com.kyaa.ecommerce.dto.responses.CreateProductResponse;
 import com.kyaa.ecommerce.data.models.Product;
 import com.kyaa.ecommerce.data.repositories.ProductRepository;
 import com.kyaa.ecommerce.exceptions.ProductException;
@@ -19,9 +19,9 @@ public class ProductServiceImpl implements ProductService {
     private ModelMapper modelMapper;
     @Override
     public CreateProductResponse createProduct(CreateProductRequest createProductRequest) {
-        if (getProductByName(createProductRequest.getName().substring(0,1).toUpperCase()).isPresent())throw new ProductException("Product already exist");
+        if (productRepository.findProductByName(createProductRequest.getName().toLowerCase()).isPresent())throw new ProductException("Product already exist");
         Product product = Product.builder().
-                name(createProductRequest.getName().substring(0,1).toUpperCase()).
+                name(createProductRequest.getName().toLowerCase()).
                 quantity(createProductRequest.getQuantity()).
                 price(createProductRequest.getPrice()).
                 category(createProductRequest.getCategory()).
@@ -32,11 +32,18 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Optional<Product> getProductByName(String name) {
+        if (productRepository.findProductByName(name).isEmpty())throw new ProductException("Product not found");
         return productRepository.findProductByName(name);
     }
 
     @Override
     public List<Product> getAllProducts() {
         return productRepository.findAll();
+    }
+
+    @Override
+    public String deleteAllProducts() {
+        productRepository.deleteAll();
+        return "Products deleted successfully";
     }
 }

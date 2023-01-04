@@ -12,9 +12,10 @@ public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne
-    @JoinColumn(name = "cart_id")
-    private User user;
-    @ManyToMany
-    private List<Product>products = new ArrayList<>();
+//    @OneToOne
+//    @JoinColumn(name = "user_id")
+//    private User user;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "Cart-Product_id")
+    private List<CartProduct>cartProducts;
 }

@@ -11,13 +11,13 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.math.BigDecimal;
 import java.time.Instant;
 
-@Entity
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
 @Data
-@Table(name = "Products")
-public class Product{
+@Entity
+@Table(name = "Cart_Product")
+@NoArgsConstructor
+@AllArgsConstructor
+public class CartProduct {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,5 +33,4 @@ public class Product{
     @CreationTimestamp
     @Column(name = "created_time")
     private Instant createdTime = Instant.now();
-
 }

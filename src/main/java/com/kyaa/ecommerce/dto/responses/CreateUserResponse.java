@@ -1,4 +1,4 @@
-package com.kyaa.ecommerce.data.dto.responses;
+package com.kyaa.ecommerce.dto.responses;
 
 import lombok.Data;
 

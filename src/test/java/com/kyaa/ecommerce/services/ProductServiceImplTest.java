@@ -1,7 +1,7 @@
 package com.kyaa.ecommerce.services;
 
-import com.kyaa.ecommerce.data.dto.requests.CreateProductRequest;
-import com.kyaa.ecommerce.data.dto.responses.CreateProductResponse;
+import com.kyaa.ecommerce.dto.requests.CreateProductRequest;
+import com.kyaa.ecommerce.dto.responses.CreateProductResponse;
 import com.kyaa.ecommerce.data.models.Product;
 import com.kyaa.ecommerce.data.repositories.ProductRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -47,7 +47,7 @@ class ProductServiceImplTest {
     @Test
     void productCanBeSearchedForUsingProductName(){
         productService.createProduct(createProductRequest);
-        Optional<Product> foundProduct = productService.getProductByName("milk");
+        Optional<Product> foundProduct = productService.getProductByName("Milk");
         assertNotNull(foundProduct);
     }
     @Test

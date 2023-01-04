@@ -1,4 +1,4 @@
-package com.kyaa.ecommerce.data.dto.responses;
+package com.kyaa.ecommerce.dto.responses;
 
 import com.kyaa.ecommerce.enums.Category;
 import lombok.Data;

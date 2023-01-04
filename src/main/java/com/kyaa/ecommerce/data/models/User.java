@@ -25,8 +25,9 @@ public class User {
     private String firstName;
     @Column(name = "last_name")
     private String lastName;
-    @OneToOne
-    private Cart cart = new Cart();
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "cart_id")
+    private Cart cart;
     @Column(name = "username", nullable = false, unique = true, length = 100)
     private String username;
     @Column(name = "password", nullable = false)

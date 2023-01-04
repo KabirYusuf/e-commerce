@@ -1,10 +1,12 @@
 package com.kyaa.ecommerce.services;
 
-import com.kyaa.ecommerce.data.dto.requests.*;
-import com.kyaa.ecommerce.data.dto.responses.*;
-import com.kyaa.ecommerce.data.models.Product;
-import com.kyaa.ecommerce.data.models.User;
+import com.kyaa.ecommerce.data.models.*;
 import com.kyaa.ecommerce.data.repositories.UserRepository;
+import com.kyaa.ecommerce.dto.requests.*;
+import com.kyaa.ecommerce.dto.responses.AddProductToCartResponse;
+import com.kyaa.ecommerce.dto.responses.CreateUserResponse;
+import com.kyaa.ecommerce.dto.responses.LoginResponse;
+import com.kyaa.ecommerce.dto.responses.UpdateUserResponse;
 import com.kyaa.ecommerce.enums.Role;
 import com.kyaa.ecommerce.exceptions.UserException;
 import jakarta.transaction.Transactional;
@@ -12,12 +14,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 
 import static com.kyaa.ecommerce.enums.Role.*;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
@@ -25,6 +29,8 @@ public class UserServiceImpl implements UserService {
     private ModelMapper modelMapper;
     @Autowired
     private  ProductService productService;
+    @Autowired
+    private AddressService addressService;
 
     @Override
     public CreateUserResponse createUser(CreateUserRequest createUserRequest){
@@ -34,7 +40,9 @@ public class UserServiceImpl implements UserService {
                 email(createUserRequest.getEmail()).
                 username(createUserRequest.getUsername()).
                 password(createUserRequest.getPassword()).
-                role(USER)
+                role(USER).
+                address(createUserRequest.getAddress()).
+                cart(new Cart())
                 .build();
         userRepository.save(user);
         return modelMapper.map(user, CreateUserResponse.class);
@@ -93,11 +101,36 @@ public class UserServiceImpl implements UserService {
     @Override
     public AddProductToCartResponse addProductToCart(AddProductToCartRequest addProductToCartRequest) {
         Optional<User> foundUser = getUserByUsername(addProductToCartRequest.getUsername());
-        Optional<Product> foundProduct = productService.getProductByName(addProductToCartRequest.getProduct().getName());
-        foundUser.get().getCart().getProducts().add(foundProduct.get());
+        Optional<Product> foundProduct = productService.getProductByName(addProductToCartRequest.getProductName().toLowerCase());
+        //Todo: create a model for cart product
+        CartProduct cartProduct = new CartProduct();
+        cartProduct.setName(foundProduct.get().getName());
+        cartProduct.setCategory(foundProduct.get().getCategory());
+        cartProduct.setQuantity(addProductToCartRequest.getQuantity());
+        cartProduct.setPrice(foundProduct.get().getPrice().multiply(new BigDecimal(cartProduct.getQuantity())));
+        foundUser.get().getCart().getCartProducts().add(cartProduct);
         AddProductToCartResponse addProductToCartResponse = new AddProductToCartResponse();
-        addProductToCartResponse.setName(addProductToCartResponse.getName());
+        addProductToCartResponse.setName(addProductToCartRequest.getProductName());
+        addProductToCartResponse.setId(cartProduct.getId());
         return addProductToCartResponse;
+    }
+
+    @Override
+    public String deleteAllUsers() {
+        userRepository.deleteAll();
+        return "Users deleted successfully";
+    }
+
+    @Override
+    public String deleteProductFromCart(String userName, String productName) {
+        Optional<User> foundUser = getUserByUsername(userName);
+        foundUser.
+                get().
+                getCart().
+                getCartProducts().
+                removeIf(cartProduct -> Objects.
+                        equals(cartProduct.getName(), productName));
+        return null;
     }
 
 //    @Override

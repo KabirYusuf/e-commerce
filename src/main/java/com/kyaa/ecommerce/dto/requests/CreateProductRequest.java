@@ -1,4 +1,4 @@
-package com.kyaa.ecommerce.data.dto.requests;
+package com.kyaa.ecommerce.dto.requests;
 
 import com.kyaa.ecommerce.enums.Category;
 import lombok.Data;
