@@ -1,10 +1,11 @@
-package com.kyaa.ecommerce.services;
+package com.kyaa.ecommerce.services.impl;
 
 import com.kyaa.ecommerce.dto.requests.CreateProductRequest;
 import com.kyaa.ecommerce.dto.responses.CreateProductResponse;
 import com.kyaa.ecommerce.data.models.Product;
 import com.kyaa.ecommerce.data.repositories.ProductRepository;
 import com.kyaa.ecommerce.exceptions.ProductException;
+import com.kyaa.ecommerce.services.ProductService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,15 +1,16 @@
-package com.kyaa.ecommerce.services;
+package com.kyaa.ecommerce.services.impl;
 
 import com.kyaa.ecommerce.dto.requests.CreateAddressRequest;
 import com.kyaa.ecommerce.dto.responses.CreateAddressResponse;
 import com.kyaa.ecommerce.data.models.Address;
 import com.kyaa.ecommerce.data.repositories.AddressRepository;
+import com.kyaa.ecommerce.services.AddressService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AddressServiceImpl implements AddressService{
+public class AddressServiceImpl implements AddressService {
     @Autowired
     private AddressRepository addressRepository;
     @Autowired

@@ -1,10 +1,13 @@
-package com.kyaa.ecommerce.services;
+package com.kyaa.ecommerce.services.impl;
 
 import com.kyaa.ecommerce.data.models.CartProduct;
 import com.kyaa.ecommerce.data.models.Product;
 import com.kyaa.ecommerce.data.models.User;
 import com.kyaa.ecommerce.dto.requests.AddProductToCartRequest;
 import com.kyaa.ecommerce.dto.responses.AddProductToCartResponse;
+import com.kyaa.ecommerce.services.CartService;
+import com.kyaa.ecommerce.services.ProductService;
+import com.kyaa.ecommerce.services.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,7 +16,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
-public class CartServiceImpl implements CartService{
+public class CartServiceImpl implements CartService {
     @Autowired
     private UserService userService;
     @Autowired

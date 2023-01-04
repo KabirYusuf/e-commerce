@@ -1,4 +1,4 @@
-package com.kyaa.ecommerce.services;
+package com.kyaa.ecommerce.services.impl;
 
 import com.kyaa.ecommerce.data.models.*;
 import com.kyaa.ecommerce.data.repositories.UserRepository;
@@ -9,6 +9,9 @@ import com.kyaa.ecommerce.dto.responses.LoginResponse;
 import com.kyaa.ecommerce.dto.responses.UpdateUserResponse;
 import com.kyaa.ecommerce.enums.Role;
 import com.kyaa.ecommerce.exceptions.UserException;
+import com.kyaa.ecommerce.services.AddressService;
+import com.kyaa.ecommerce.services.ProductService;
+import com.kyaa.ecommerce.services.UserService;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +31,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private ModelMapper modelMapper;
     @Autowired
-    private  ProductService productService;
+    private ProductService productService;
     @Autowired
     private AddressService addressService;
 
@@ -50,13 +53,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> getUserById(Long id) {
-        if (userRepository.findById(id).isEmpty())throw new UserException("User does not exist");
+        if (userRepository.findById(id).
+                isEmpty())throw new UserException("User does not exist");
         return userRepository.findById(id);
     }
 
     @Override
     public Optional<User> getUserByUsername (String username){
-        if (userRepository.findUserByUsername(username).isEmpty())throw new UserException("User does not exist");
+        if (userRepository.findUserByUsername(username)
+                .isEmpty())throw new UserException("User does not exist");
         return userRepository.findUserByUsername(username);
     }
 

@@ -7,7 +7,6 @@ import com.kyaa.ecommerce.dto.responses.CreateUserResponse;
 import com.kyaa.ecommerce.dto.responses.LoginResponse;
 import com.kyaa.ecommerce.data.models.Product;
 import com.kyaa.ecommerce.data.models.User;
-import com.kyaa.ecommerce.data.repositories.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
