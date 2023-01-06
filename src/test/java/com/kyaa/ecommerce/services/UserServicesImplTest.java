@@ -25,6 +25,8 @@ class UserServicesImplTest {
 @Autowired
 private UserService userService;
 @Autowired
+private CartProductService cartProductService;
+@Autowired
 private ProductService productService;
 
 private CreateProductRequest createProductRequest;
@@ -50,6 +52,7 @@ private CreateUserResponse createUserResponse;
     void afterEach(){
         userService.deleteAllUsers();
         productService.deleteAllProducts();
+        cartProductService.deleteAllCartProducts();
     }
 
     @Test
@@ -148,6 +151,7 @@ private CreateUserResponse createUserResponse;
         System.out.println(foundUserAfterAddingProductToCart.get().getCart());
         var numberOfProductsInUserCartAfterAddingAProduct = foundUserAfterAddingProductToCart.get().getCart().getCartProducts().size();
         assertEquals(1, numberOfProductsInUserCartAfterAddingAProduct);
+        assertEquals(1, cartProductService.getAllCartProducts().size());
     }
 
     @Test
@@ -173,7 +177,8 @@ private CreateUserResponse createUserResponse;
         var numberOfProductsInUserCartAfterAddingAProduct = foundUserAfterAddingProductToCart.get().getCart().getCartProducts().size();
         assertEquals(1, numberOfProductsInUserCartAfterAddingAProduct);
 
-        userService.deleteProductFromCart(createUserResponse.getUsername(), addProductToCartResponse.getName());
+//        userService.deleteProductFromCart(createUserResponse.getUsername(), addProductToCartResponse.getName());
+        cartProductService.deleteCartProductById(addProductToCartResponse.getId());
         Optional<User> foundUserAfterDeletingProductToCart = userService.getUserByUsername("kyaa");
         var numberOfProductsInUserCartAfterDeletingAProduct = foundUserAfterDeletingProductToCart.get().getCart().getCartProducts().size();
         assertEquals(0, numberOfProductsInUserCartAfterDeletingAProduct);

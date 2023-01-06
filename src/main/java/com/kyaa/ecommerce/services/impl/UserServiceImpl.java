@@ -10,11 +10,13 @@ import com.kyaa.ecommerce.dto.responses.UpdateUserResponse;
 import com.kyaa.ecommerce.enums.Role;
 import com.kyaa.ecommerce.exceptions.UserException;
 import com.kyaa.ecommerce.services.AddressService;
+import com.kyaa.ecommerce.services.CartProductService;
 import com.kyaa.ecommerce.services.ProductService;
 import com.kyaa.ecommerce.services.UserService;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -28,6 +30,8 @@ import static com.kyaa.ecommerce.enums.Role.*;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CartProductService cartProductService;
     @Autowired
     private ModelMapper modelMapper;
     @Autowired
@@ -113,10 +117,11 @@ public class UserServiceImpl implements UserService {
         cartProduct.setCategory(foundProduct.get().getCategory());
         cartProduct.setQuantity(addProductToCartRequest.getQuantity());
         cartProduct.setPrice(foundProduct.get().getPrice().multiply(new BigDecimal(cartProduct.getQuantity())));
-        foundUser.get().getCart().getCartProducts().add(cartProduct);
+        CartProduct savedCartProduct = cartProductService.createCartProduct(cartProduct);
+        foundUser.get().getCart().getCartProducts().add(savedCartProduct);
         AddProductToCartResponse addProductToCartResponse = new AddProductToCartResponse();
         addProductToCartResponse.setName(addProductToCartRequest.getProductName());
-        addProductToCartResponse.setId(cartProduct.getId());
+        addProductToCartResponse.setId(savedCartProduct.getId());
         return addProductToCartResponse;
     }
 
@@ -126,17 +131,17 @@ public class UserServiceImpl implements UserService {
         return "Users deleted successfully";
     }
 
-    @Override
-    public String deleteProductFromCart(String userName, String productName) {
-        Optional<User> foundUser = getUserByUsername(userName);
-        foundUser.
-                get().
-                getCart().
-                getCartProducts().
-                removeIf(cartProduct -> Objects.
-                        equals(cartProduct.getName(), productName));
-        return null;
-    }
+//    @Override
+//    public String deleteProductFromCart(String userName, String productName) {
+//        Optional<User> foundUser = getUserByUsername(userName);
+//        foundUser.
+//                get().
+//                getCart().
+//                getCartProducts().
+//                removeIf(cartProduct -> Objects.
+//                        equals(cartProduct.getName(), productName));
+//        return null;
+//    }
 
 //    @Override
 //    public CreateProductResponse addProduct(CreateProductRequest createProductRequest, String username) {

@@ -29,5 +29,5 @@ public interface UserService {
     AddProductToCartResponse addProductToCart(AddProductToCartRequest addProductToCartRequest);
     String deleteAllUsers();
 
-    String deleteProductFromCart(String username, String productName);
+//    String deleteProductFromCart(String username, String productName);
 }
