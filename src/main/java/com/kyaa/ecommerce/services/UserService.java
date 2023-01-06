@@ -1,10 +1,7 @@
 package com.kyaa.ecommerce.services;
 
 import com.kyaa.ecommerce.data.models.User;
-import com.kyaa.ecommerce.dto.requests.AddProductToCartRequest;
-import com.kyaa.ecommerce.dto.requests.CreateUserRequest;
-import com.kyaa.ecommerce.dto.requests.LoginRequest;
-import com.kyaa.ecommerce.dto.requests.UpdateUserRequest;
+import com.kyaa.ecommerce.dto.requests.*;
 import com.kyaa.ecommerce.dto.responses.AddProductToCartResponse;
 import com.kyaa.ecommerce.dto.responses.CreateUserResponse;
 import com.kyaa.ecommerce.dto.responses.LoginResponse;
@@ -29,5 +26,5 @@ public interface UserService {
     AddProductToCartResponse addProductToCart(AddProductToCartRequest addProductToCartRequest);
     String deleteAllUsers();
 
-//    String deleteProductFromCart(String username, String productName);
+    String deleteProductFromCart(DeleteCartProductFromCartRequest deleteCartProductFromCartRequest);
 }

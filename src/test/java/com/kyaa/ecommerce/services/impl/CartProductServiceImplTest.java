@@ -53,7 +53,7 @@ class CartProductServiceImplTest {
         assertEquals(1, cartProductDbSize);
     }
     @Test
-    void cartProductCanBeDeletedByNameOfProduct(){
+    void cartProductCanBeDeletedByIdOfProduct(){
         CartProduct savedCartProduct = cartProductService.createCartProduct(cartProductOne);
         cartProductService.createCartProduct(cartProductTwo);
         int cartProductDbSizeBeforeDeletingAProduct = cartProductService.getAllCartProducts().size();

@@ -135,13 +135,11 @@ private CreateUserResponse createUserResponse;
         Optional<User> foundUser = userService.getUserByUsername("kyaa");
         var numberOfProductsInUserCartBeforeAddingAProduct = foundUser.get().getCart().getCartProducts().size();
         assertEquals(0, numberOfProductsInUserCartBeforeAddingAProduct);
+
         productService.createProduct(createProductRequest);
-        Optional<Product> foundProduct = productService.getProductByName("milk");
-        System.out.println(productService.getAllProducts().size());
-        System.out.println(productService.getAllProducts().get(0));
-//        System.out.println(foundProduct.get());
+
         AddProductToCartRequest addProductToCartRequest = new AddProductToCartRequest();
-//        addProductToCartRequest.setProduct(foundProduct.get());
+
         addProductToCartRequest.setUsername("kyaa");
         addProductToCartRequest.setProductName("milk");
         addProductToCartRequest.setQuantity(2);
@@ -162,11 +160,9 @@ private CreateUserResponse createUserResponse;
         assertEquals(0, numberOfProductsInUserCartBeforeAddingAProduct);
         productService.createProduct(createProductRequest);
         Optional<Product> foundProduct = productService.getProductByName("milk");
-        System.out.println(productService.getAllProducts().size());
-        System.out.println(productService.getAllProducts().get(0));
-//        System.out.println(foundProduct.get());
+
         AddProductToCartRequest addProductToCartRequest = new AddProductToCartRequest();
-//        addProductToCartRequest.setProduct(foundProduct.get());
+
         addProductToCartRequest.setUsername("kyaa");
         addProductToCartRequest.setProductName("milk");
         addProductToCartRequest.setQuantity(2);
@@ -177,11 +173,16 @@ private CreateUserResponse createUserResponse;
         var numberOfProductsInUserCartAfterAddingAProduct = foundUserAfterAddingProductToCart.get().getCart().getCartProducts().size();
         assertEquals(1, numberOfProductsInUserCartAfterAddingAProduct);
 
-//        userService.deleteProductFromCart(createUserResponse.getUsername(), addProductToCartResponse.getName());
-        cartProductService.deleteCartProductById(addProductToCartResponse.getId());
+        DeleteCartProductFromCartRequest deleteCartProductFromCartRequest = new DeleteCartProductFromCartRequest();
+        deleteCartProductFromCartRequest.setUsername("kyaa");
+        deleteCartProductFromCartRequest.setCartProductId(addProductToCartResponse.getId());
+
+        userService.deleteProductFromCart(deleteCartProductFromCartRequest);
+
         Optional<User> foundUserAfterDeletingProductToCart = userService.getUserByUsername("kyaa");
         var numberOfProductsInUserCartAfterDeletingAProduct = foundUserAfterDeletingProductToCart.get().getCart().getCartProducts().size();
         assertEquals(0, numberOfProductsInUserCartAfterDeletingAProduct);
+        assertEquals(0, cartProductService.getAllCartProducts().size());
     }
 
 }

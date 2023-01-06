@@ -16,7 +16,6 @@ import com.kyaa.ecommerce.services.UserService;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -131,17 +130,18 @@ public class UserServiceImpl implements UserService {
         return "Users deleted successfully";
     }
 
-//    @Override
-//    public String deleteProductFromCart(String userName, String productName) {
-//        Optional<User> foundUser = getUserByUsername(userName);
+    @Override
+    public String deleteProductFromCart(DeleteCartProductFromCartRequest deleteCartProductFromCartRequest) {
+//        Optional<User> foundUser = getUserByUsername(deleteCartProductFromCartRequest.getUsername());
 //        foundUser.
 //                get().
 //                getCart().
 //                getCartProducts().
 //                removeIf(cartProduct -> Objects.
-//                        equals(cartProduct.getName(), productName));
-//        return null;
-//    }
+//                        equals(cartProduct.getId(), deleteCartProductFromCartRequest.getCartProductId()));
+        cartProductService.deleteCartProductById(deleteCartProductFromCartRequest.getCartProductId());
+        return "Deleted successfully";
+    }
 
 //    @Override
 //    public CreateProductResponse addProduct(CreateProductRequest createProductRequest, String username) {
