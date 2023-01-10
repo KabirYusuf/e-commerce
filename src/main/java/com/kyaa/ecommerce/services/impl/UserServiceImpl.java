@@ -40,11 +40,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public CreateUserResponse createUser(CreateUserRequest createUserRequest){
-        if (userRepository.findUserByUsername(createUserRequest.getUsername()).isPresent())throw new UserException("username already exist");
+        if (userRepository.findUserByUsername(createUserRequest.getUsername().toLowerCase()).isPresent())throw new UserException("username already exist");
         if (userRepository.findUserByEmail(createUserRequest.getEmail()).isPresent())throw new UserException("User with this email already exist");
         User user = User.builder().
                 email(createUserRequest.getEmail()).
-                username(createUserRequest.getUsername()).
+                username(createUserRequest.getUsername().toLowerCase()).
                 password(createUserRequest.getPassword()).
                 role(USER).
                 address(createUserRequest.getAddress()).
@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> getUserByUsername (String username){
-        if (userRepository.findUserByUsername(username)
+        if (userRepository.findUserByUsername(username.toLowerCase())
                 .isEmpty())throw new UserException("User does not exist");
         return userRepository.findUserByUsername(username);
     }
@@ -88,7 +88,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UpdateUserResponse updateUserInfo(UpdateUserRequest updateUserRequest) {
-        Optional<User> foundUser = getUserByUsername(updateUserRequest.getUsername());
+        Optional<User> foundUser = getUserByUsername(updateUserRequest.getUsername().toLowerCase());
         if (updateUserRequest.getFirstName() != null)foundUser.ifPresent(user->user.setFirstName(updateUserRequest.getFirstName()));
         if (updateUserRequest.getLastName() != null)foundUser.ifPresent(user -> user.setLastName(updateUserRequest.getLastName()));
         if (updateUserRequest.getAddress() != null)foundUser.ifPresent(user -> user.setAddress(updateUserRequest.getAddress()));
@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
-        Optional<User> foundUser = getUserByUsername(loginRequest.getUsername());
+        Optional<User> foundUser = getUserByUsername(loginRequest.getUsername().toLowerCase());
         LoginResponse loginResponse = new LoginResponse();
         if (Objects.equals(loginRequest.getPassword(), foundUser.get().getPassword())){
             loginResponse.setMessage("login successful");
@@ -115,7 +115,8 @@ public class UserServiceImpl implements UserService {
         cartProduct.setName(foundProduct.get().getName());
         cartProduct.setCategory(foundProduct.get().getCategory());
         cartProduct.setQuantity(addProductToCartRequest.getQuantity());
-        cartProduct.setPrice(foundProduct.get().getPrice().multiply(new BigDecimal(cartProduct.getQuantity())));
+        cartProduct.setUnitPrice(foundProduct.get().getPrice());
+        cartProduct.setTotalPrice(foundProduct.get().getPrice().multiply(new BigDecimal(cartProduct.getQuantity())));
         CartProduct savedCartProduct = cartProductService.createCartProduct(cartProduct);
         foundUser.get().getCart().getCartProducts().add(savedCartProduct);
         AddProductToCartResponse addProductToCartResponse = new AddProductToCartResponse();

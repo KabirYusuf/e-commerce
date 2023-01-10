@@ -54,7 +54,8 @@ public class CartServiceImpl implements CartService {
         cartProduct.setName(foundProduct.get().getName());
         cartProduct.setCategory(foundProduct.get().getCategory());
         cartProduct.setQuantity(addProductToCartRequest.getQuantity());
-        cartProduct.setPrice(foundProduct.get().getPrice().multiply(new BigDecimal(cartProduct.getQuantity())));
+        cartProduct.setUnitPrice(foundProduct.get().getPrice());
+        cartProduct.setTotalPrice(foundProduct.get().getPrice().multiply(new BigDecimal(cartProduct.getQuantity())));
         foundUser.get().getCart().getCartProducts().add(cartProduct);
 //        AddProductToCartResponse addProductToCartResponse = new AddProductToCartResponse();
 //        addProductToCartResponse.setName(addProductToCartResponse.getName());

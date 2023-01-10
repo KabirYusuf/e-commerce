@@ -1,6 +1,7 @@
 package com.kyaa.ecommerce.services.impl;
 
 import com.kyaa.ecommerce.data.models.CartProduct;
+import com.kyaa.ecommerce.dto.requests.UpdateCartProductRequest;
 import com.kyaa.ecommerce.enums.Category;
 import com.kyaa.ecommerce.services.CartProductService;
 import org.glassfish.jaxb.core.v2.TODO;
@@ -26,13 +27,15 @@ class CartProductServiceImplTest {
         cartProductOne = new CartProduct();
         cartProductOne.setName("milk");
         cartProductOne.setQuantity(3);
-        cartProductOne.setPrice(BigDecimal.valueOf(50));
+        cartProductOne.setUnitPrice(BigDecimal.valueOf(10));
+        cartProductOne.setTotalPrice(BigDecimal.valueOf(30));
         cartProductOne.setCategory(Category.BEVERAGES);
+
 
         cartProductTwo = new CartProduct();
         cartProductTwo.setName("milo");
         cartProductTwo.setQuantity(5);
-        cartProductTwo.setPrice(BigDecimal.valueOf(34));
+        cartProductTwo.setTotalPrice(BigDecimal.valueOf(34));
         cartProductTwo.setCategory(Category.BEVERAGES);
     }
 
@@ -62,6 +65,43 @@ class CartProductServiceImplTest {
         int cartProductDbSizeAfterDeletingAProduct = cartProductService.getAllCartProducts().size();
         assertEquals(1, cartProductDbSizeAfterDeletingAProduct);
     }
+    @Test
+    void testThatCartProductCanBeFoundUsingCartProductId(){
+        CartProduct savedCartProduct = cartProductService.createCartProduct(cartProductOne);
+        CartProduct foundCartProduct = cartProductService.findCartProductById(savedCartProduct.getId());
+        assertEquals(foundCartProduct.getName(), savedCartProduct.getName());
+    }
 
     //  Todo update cartProduct
+    @Test
+    void testThatCartProductQuantityCanBeUpdated(){
+        CartProduct savedCartProduct = cartProductService.createCartProduct(cartProductOne);
+        Integer quantityBeforeUpdate = cartProductService.findCartProductById(savedCartProduct.getId()).getQuantity();
+        assertEquals(3, quantityBeforeUpdate);
+
+        UpdateCartProductRequest updateCartProductRequest = new UpdateCartProductRequest();
+        updateCartProductRequest.setCartProductId(savedCartProduct.getId());
+        updateCartProductRequest.setQuantity(10);
+        cartProductService.updateCartProduct(updateCartProductRequest);
+
+        CartProduct foundCartProduct= cartProductService.findCartProductById(savedCartProduct.getId());
+        assertEquals(10, foundCartProduct.getQuantity());
+    }
+
+    @Test
+    void testWhenCartProductQuantityIsUpdated_TotalPriceOfQuantityIsAlsoUpdated(){
+        CartProduct savedCartProduct = cartProductService.createCartProduct(cartProductOne);
+        Integer quantityBeforeUpdate = cartProductService.findCartProductById(savedCartProduct.getId()).getQuantity();
+        assertEquals(3, quantityBeforeUpdate);
+        assertEquals(BigDecimal.valueOf(30), savedCartProduct.getTotalPrice());
+
+        UpdateCartProductRequest updateCartProductRequest = new UpdateCartProductRequest();
+        updateCartProductRequest.setCartProductId(savedCartProduct.getId());
+        updateCartProductRequest.setQuantity(10);
+        cartProductService.updateCartProduct(updateCartProductRequest);
+
+        CartProduct foundCartProduct= cartProductService.findCartProductById(savedCartProduct.getId());
+        assertEquals(10, foundCartProduct.getQuantity());
+        assertEquals(new BigDecimal("100.00"), foundCartProduct.getTotalPrice());
+    }
 }

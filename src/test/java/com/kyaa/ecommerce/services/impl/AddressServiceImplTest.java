@@ -1,8 +1,9 @@
-package com.kyaa.ecommerce.services;
+package com.kyaa.ecommerce.services.impl;
 
 import com.kyaa.ecommerce.dto.requests.CreateAddressRequest;
 import com.kyaa.ecommerce.dto.responses.CreateAddressResponse;
 import com.kyaa.ecommerce.data.repositories.AddressRepository;
+import com.kyaa.ecommerce.services.AddressService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

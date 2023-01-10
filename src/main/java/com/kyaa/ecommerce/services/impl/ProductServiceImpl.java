@@ -1,10 +1,13 @@
 package com.kyaa.ecommerce.services.impl;
 
 import com.kyaa.ecommerce.dto.requests.CreateProductRequest;
+import com.kyaa.ecommerce.dto.requests.UpdateCartProductRequest;
+import com.kyaa.ecommerce.dto.requests.UpdateProductRequest;
 import com.kyaa.ecommerce.dto.responses.CreateProductResponse;
 import com.kyaa.ecommerce.data.models.Product;
 import com.kyaa.ecommerce.data.repositories.ProductRepository;
 import com.kyaa.ecommerce.exceptions.ProductException;
+import com.kyaa.ecommerce.services.CartProductService;
 import com.kyaa.ecommerce.services.ProductService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,8 @@ import java.util.Optional;
 public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private CartProductService cartProductService;
     @Autowired
     private ModelMapper modelMapper;
     @Override
@@ -33,7 +38,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Optional<Product> getProductByName(String name) {
-        if (productRepository.findProductByName(name).isEmpty())throw new ProductException("Product not found");
+        if (productRepository.findProductByName(name.toLowerCase()).isEmpty())throw new ProductException("Product not found");
         return productRepository.findProductByName(name);
     }
 
@@ -46,5 +51,23 @@ public class ProductServiceImpl implements ProductService {
     public String deleteAllProducts() {
         productRepository.deleteAll();
         return "Products deleted successfully";
+    }
+
+    @Override
+    public String updateProduct(UpdateProductRequest updateProductRequest) {
+        Optional<Product> foundProduct = getProductByName(updateProductRequest.getProductName().toLowerCase());
+        if (updateProductRequest.getPrice() != null)foundProduct.get().setPrice(updateProductRequest.getPrice());
+        if (updateProductRequest.getCategory() != null) foundProduct.get().setCategory(updateProductRequest.getCategory());
+        if (updateProductRequest.getQuantity() != null)foundProduct.get().setQuantity(updateProductRequest.getQuantity());
+        productRepository.save(foundProduct.get());
+//        UpdateCartProductRequest updateCartProductRequest = new UpdateCartProductRequest();
+//        updateCartProductRequest.s
+        cartProductService.updateListOfCartProducts(updateProductRequest.getProductName(), updateProductRequest.getPrice());
+        return "Product updated successfully";
+    }
+
+    @Override
+    public Product getProductById(Long id) {
+        return productRepository.findProductById(id).orElseThrow(() -> new ProductException("Product doesnt not exist"));
     }
 }

@@ -1,4 +1,4 @@
-package com.kyaa.ecommerce.services;
+package com.kyaa.ecommerce.services.impl;
 
 import com.kyaa.ecommerce.data.models.Address;
 import com.kyaa.ecommerce.data.models.Product;
@@ -10,6 +10,9 @@ import com.kyaa.ecommerce.dto.requests.CreateUserRequest;
 import com.kyaa.ecommerce.dto.responses.CreateProductResponse;
 import com.kyaa.ecommerce.dto.responses.CreateUserResponse;
 import com.kyaa.ecommerce.enums.Category;
+import com.kyaa.ecommerce.services.CartService;
+import com.kyaa.ecommerce.services.ProductService;
+import com.kyaa.ecommerce.services.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
