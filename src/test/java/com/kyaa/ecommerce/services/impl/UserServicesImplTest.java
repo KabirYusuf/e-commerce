@@ -1,13 +1,12 @@
 package com.kyaa.ecommerce.services.impl;
 
 import com.kyaa.ecommerce.data.models.Address;
-import com.kyaa.ecommerce.dto.requests.*;
-import com.kyaa.ecommerce.dto.responses.AddProductToCartResponse;
-import com.kyaa.ecommerce.dto.responses.CreateUserResponse;
-import com.kyaa.ecommerce.dto.responses.LoginResponse;
 import com.kyaa.ecommerce.data.models.Product;
+import com.kyaa.ecommerce.dto.requests.*;
+import com.kyaa.ecommerce.dto.responses.*;
 import com.kyaa.ecommerce.data.models.User;
 import com.kyaa.ecommerce.services.CartProductService;
+import com.kyaa.ecommerce.services.OrderHistoryService;
 import com.kyaa.ecommerce.services.ProductService;
 import com.kyaa.ecommerce.services.UserService;
 import org.junit.jupiter.api.*;
@@ -31,6 +30,8 @@ private UserService userService;
 private CartProductService cartProductService;
 @Autowired
 private ProductService productService;
+@Autowired
+private OrderHistoryService orderHistoryService;
 
 private CreateProductRequest createProductRequest;
 private CreateUserRequest createUserRequest;
@@ -53,9 +54,10 @@ private CreateUserResponse createUserResponse;
     }
     @AfterEach
     void afterEach(){
+        cartProductService.deleteAllCartProducts();
+        orderHistoryService.deleteOrderHistories();
         userService.deleteAllUsers();
         productService.deleteAllProducts();
-        cartProductService.deleteAllCartProducts();
     }
 
     @Test
@@ -162,7 +164,7 @@ private CreateUserResponse createUserResponse;
         var numberOfProductsInUserCartBeforeAddingAProduct = foundUser.get().getCart().getCartProducts().size();
         assertEquals(0, numberOfProductsInUserCartBeforeAddingAProduct);
         productService.createProduct(createProductRequest);
-        Optional<Product> foundProduct = productService.getProductByName("milk");
+        productService.getProductByName("milk");
 
         AddProductToCartRequest addProductToCartRequest = new AddProductToCartRequest();
 
@@ -176,16 +178,63 @@ private CreateUserResponse createUserResponse;
         var numberOfProductsInUserCartAfterAddingAProduct = foundUserAfterAddingProductToCart.get().getCart().getCartProducts().size();
         assertEquals(1, numberOfProductsInUserCartAfterAddingAProduct);
 
-        DeleteCartProductFromCartRequest deleteCartProductFromCartRequest = new DeleteCartProductFromCartRequest();
-        deleteCartProductFromCartRequest.setUsername("kyaa");
-        deleteCartProductFromCartRequest.setCartProductId(addProductToCartResponse.getId());
+//        DeleteCartProductFromCartRequest deleteCartProductFromCartRequest = new DeleteCartProductFromCartRequest();
+//        deleteCartProductFromCartRequest.setUsername("kyaa");
+//        deleteCartProductFromCartRequest.setCartProductId(addProductToCartResponse.getId());
 
-        userService.deleteProductFromCart(deleteCartProductFromCartRequest);
+        userService.deleteProductFromCart(addProductToCartResponse.getId());
 
         Optional<User> foundUserAfterDeletingProductToCart = userService.getUserByUsername("kyaa");
         var numberOfProductsInUserCartAfterDeletingAProduct = foundUserAfterDeletingProductToCart.get().getCart().getCartProducts().size();
         assertEquals(0, numberOfProductsInUserCartAfterDeletingAProduct);
         assertEquals(0, cartProductService.getAllCartProducts().size());
+    }
+    @Test
+    void testThatUserCanOrderProducts(){
+        CreateUserResponse createUserResponse = userService.createUser(createUserRequest);
+        CreateProductResponse createProductResponse = productService.createProduct(createProductRequest);
+        OrderProductRequest orderProductRequest = new OrderProductRequest();
+        orderProductRequest.setUserId(createUserResponse.getId());
+        orderProductRequest.setProductId(createProductResponse.getId());
+        orderProductRequest.setQuantity(2);
+        orderProductRequest.setPrice(BigDecimal.valueOf(100));
+        OrderProductResponse orderProductResponse = userService.orderProduct(orderProductRequest);
+        assertEquals("Product ordered successfully", orderProductResponse.getMessage());
+    }
+    @Test
+    void testThatWhenUserOrdersAProduct_OrderHistoryIsGeneratedForThatUser(){
+        CreateUserResponse createUserResponse = userService.createUser(createUserRequest);
+        CreateProductResponse createProductResponse = productService.createProduct(createProductRequest);
+        OrderProductRequest orderProductRequest = new OrderProductRequest();
+        orderProductRequest.setUserId(createUserResponse.getId());
+        orderProductRequest.setProductId(createProductResponse.getId());
+        orderProductRequest.setQuantity(2);
+        orderProductRequest.setPrice(BigDecimal.valueOf(100));
+        assertEquals(0, orderHistoryService.orderHistories().size());
+        userService.orderProduct(orderProductRequest);
+        assertNotNull(orderHistoryService.orderHistories().get(0).getId());
+        assertEquals(1, orderHistoryService.orderHistories().size());
+        assertEquals(createUserResponse.getId(), orderHistoryService.orderHistories().get(0).getUser().getId());
+        System.out.println(orderHistoryService.orderHistories());
+    }
+    @Test
+    void testThatProductQuantityIsUpdatedInProductDbWhenAUserSuccessfullyOrdersAProduct(){
+        CreateUserResponse createUserResponse = userService.createUser(createUserRequest);
+        CreateProductResponse createProductResponse = productService.createProduct(createProductRequest);
+
+        Optional<Product>productBeforeOrder = productService.getProductByName("milk");
+        assertEquals(3, productBeforeOrder.get().getQuantity());
+        OrderProductRequest orderProductRequest = new OrderProductRequest();
+        orderProductRequest.setUserId(createUserResponse.getId());
+        orderProductRequest.setProductId(createProductResponse.getId());
+        orderProductRequest.setQuantity(2);
+        orderProductRequest.setPrice(BigDecimal.valueOf(100));
+        userService.orderProduct(orderProductRequest);
+        assertEquals(1, orderHistoryService.orderHistories().size());
+
+        Optional<Product> productAfterOrder = productService.getProductByName("milk");
+        assertEquals(1, productAfterOrder.get().getQuantity());
+
     }
 
 }

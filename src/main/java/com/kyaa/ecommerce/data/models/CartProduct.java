@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -35,4 +36,7 @@ public class CartProduct {
     @CreationTimestamp
     @Column(name = "created_time")
     private Instant createdTime = Instant.now();
+    @UpdateTimestamp
+    @Column(name = "updated_time")
+    private Instant updatedTime = Instant.now();
 }

@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -23,8 +24,8 @@ public class Product{
     private Long id;
     @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "price", nullable = false)
-    private BigDecimal price;
+    @Column(name = "unit-price", nullable = false)
+    private BigDecimal unitPrice;
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
     @Enumerated(EnumType.STRING)
@@ -33,5 +34,8 @@ public class Product{
     @CreationTimestamp
     @Column(name = "created_time")
     private Instant createdTime = Instant.now();
+    @UpdateTimestamp
+    @Column(name = "updated_time")
+    private Instant updatedTime = Instant.now();
 
 }

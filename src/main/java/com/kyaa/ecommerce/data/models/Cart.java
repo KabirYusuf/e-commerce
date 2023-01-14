@@ -15,6 +15,6 @@ public class Cart {
 //    @JoinColumn(name = "user_id")
 //    private User user;
     @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "Cart-Product_id")
+    @JoinColumn(name = "Cart-id")
     private List<CartProduct>cartProducts;
 }

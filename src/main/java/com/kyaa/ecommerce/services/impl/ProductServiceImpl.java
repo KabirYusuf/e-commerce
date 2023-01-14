@@ -29,7 +29,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = Product.builder().
                 name(createProductRequest.getName().toLowerCase()).
                 quantity(createProductRequest.getQuantity()).
-                price(createProductRequest.getPrice()).
+                unitPrice(createProductRequest.getPrice()).
                 category(createProductRequest.getCategory()).
                 build();
         Product savedProduct = productRepository.save(product);
@@ -48,15 +48,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public String deleteAllProducts() {
+    public void deleteAllProducts() {
         productRepository.deleteAll();
-        return "Products deleted successfully";
     }
 
     @Override
     public String updateProduct(UpdateProductRequest updateProductRequest) {
         Optional<Product> foundProduct = getProductByName(updateProductRequest.getProductName().toLowerCase());
-        if (updateProductRequest.getPrice() != null)foundProduct.get().setPrice(updateProductRequest.getPrice());
+        if (updateProductRequest.getPrice() != null)foundProduct.get().setUnitPrice(updateProductRequest.getPrice());
         if (updateProductRequest.getCategory() != null) foundProduct.get().setCategory(updateProductRequest.getCategory());
         if (updateProductRequest.getQuantity() != null)foundProduct.get().setQuantity(updateProductRequest.getQuantity());
         productRepository.save(foundProduct.get());

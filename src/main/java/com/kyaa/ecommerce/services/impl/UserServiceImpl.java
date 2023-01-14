@@ -3,16 +3,11 @@ package com.kyaa.ecommerce.services.impl;
 import com.kyaa.ecommerce.data.models.*;
 import com.kyaa.ecommerce.data.repositories.UserRepository;
 import com.kyaa.ecommerce.dto.requests.*;
-import com.kyaa.ecommerce.dto.responses.AddProductToCartResponse;
-import com.kyaa.ecommerce.dto.responses.CreateUserResponse;
-import com.kyaa.ecommerce.dto.responses.LoginResponse;
-import com.kyaa.ecommerce.dto.responses.UpdateUserResponse;
+import com.kyaa.ecommerce.dto.responses.*;
 import com.kyaa.ecommerce.enums.Role;
+import com.kyaa.ecommerce.exceptions.ProductException;
 import com.kyaa.ecommerce.exceptions.UserException;
-import com.kyaa.ecommerce.services.AddressService;
-import com.kyaa.ecommerce.services.CartProductService;
-import com.kyaa.ecommerce.services.ProductService;
-import com.kyaa.ecommerce.services.UserService;
+import com.kyaa.ecommerce.services.*;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +26,8 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     @Autowired
     private CartProductService cartProductService;
+    @Autowired
+    private OrderHistoryService orderHistoryService;
     @Autowired
     private ModelMapper modelMapper;
     @Autowired
@@ -75,9 +72,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUserById(Long id) {
-        getUserById(id);
         userRepository.deleteById(id);
-
     }
 
     @Override
@@ -110,13 +105,13 @@ public class UserServiceImpl implements UserService {
     public AddProductToCartResponse addProductToCart(AddProductToCartRequest addProductToCartRequest) {
         Optional<User> foundUser = getUserByUsername(addProductToCartRequest.getUsername());
         Optional<Product> foundProduct = productService.getProductByName(addProductToCartRequest.getProductName().toLowerCase());
-        //Todo: create a model for cart product
+
         CartProduct cartProduct = new CartProduct();
         cartProduct.setName(foundProduct.get().getName());
         cartProduct.setCategory(foundProduct.get().getCategory());
         cartProduct.setQuantity(addProductToCartRequest.getQuantity());
-        cartProduct.setUnitPrice(foundProduct.get().getPrice());
-        cartProduct.setTotalPrice(foundProduct.get().getPrice().multiply(new BigDecimal(cartProduct.getQuantity())));
+        cartProduct.setUnitPrice(foundProduct.get().getUnitPrice());
+        cartProduct.setTotalPrice(foundProduct.get().getUnitPrice().multiply(new BigDecimal(cartProduct.getQuantity())));
         CartProduct savedCartProduct = cartProductService.createCartProduct(cartProduct);
         foundUser.get().getCart().getCartProducts().add(savedCartProduct);
         AddProductToCartResponse addProductToCartResponse = new AddProductToCartResponse();
@@ -126,13 +121,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String deleteAllUsers() {
+    public void deleteAllUsers() {
         userRepository.deleteAll();
-        return "Users deleted successfully";
     }
 
     @Override
-    public String deleteProductFromCart(DeleteCartProductFromCartRequest deleteCartProductFromCartRequest) {
+    public void deleteProductFromCart(Long cartProductId) {
 //        Optional<User> foundUser = getUserByUsername(deleteCartProductFromCartRequest.getUsername());
 //        foundUser.
 //                get().
@@ -140,8 +134,38 @@ public class UserServiceImpl implements UserService {
 //                getCartProducts().
 //                removeIf(cartProduct -> Objects.
 //                        equals(cartProduct.getId(), deleteCartProductFromCartRequest.getCartProductId()));
-        cartProductService.deleteCartProductById(deleteCartProductFromCartRequest.getCartProductId());
-        return "Deleted successfully";
+        cartProductService.deleteCartProductById(cartProductId);
+//        return "Deleted successfully";
+    }
+
+    @Override
+    public OrderProductResponse orderProduct(OrderProductRequest orderProductRequest) {
+        Optional<User> foundUser = getUserById(orderProductRequest.getUserId());
+        Product foundProduct = productService.getProductById(orderProductRequest.getProductId());
+        OrderProductResponse orderProductResponse = new OrderProductResponse();
+        if (foundProduct.getQuantity() <= orderProductRequest.
+                getQuantity())throw new ProductException("Insufficient quantity");
+        else if (foundProduct.
+                getUnitPrice().
+                multiply(new BigDecimal(orderProductRequest.getQuantity())).
+                compareTo(orderProductRequest.getPrice()) > 0)throw new ProductException("Insufficient Amount");
+        else{
+            orderProductResponse.setMessage("Product ordered successfully");
+            OrderHistory orderHistory = new OrderHistory();
+            orderHistory.setProduct(foundProduct);
+            orderHistory.setUser(foundUser.get());
+            orderHistory.setProductName(foundProduct.getName());
+            orderHistory.setQuantity(orderProductRequest.getQuantity());
+            orderHistory.setUnitPrice(foundProduct.getUnitPrice());
+            orderHistory.setTotalPrice(foundProduct.getUnitPrice().multiply(new BigDecimal(orderProductRequest.getQuantity())));
+            orderHistoryService.save(orderHistory);
+            UpdateProductRequest updateProductRequest = new UpdateProductRequest();
+            updateProductRequest.setProductName(foundProduct.getName());
+            updateProductRequest.setQuantity(foundProduct.getQuantity() - orderProductRequest.getQuantity());
+            updateProductRequest.setPrice(foundProduct.getUnitPrice());
+            productService.updateProduct(updateProductRequest);
+        }
+        return orderProductResponse;
     }
 
 //    @Override

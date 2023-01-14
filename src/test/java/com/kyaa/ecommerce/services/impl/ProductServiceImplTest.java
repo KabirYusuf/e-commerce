@@ -84,7 +84,7 @@ class ProductServiceImplTest {
         CreateProductResponse createProductResponse = productService.createProduct(createProductRequest);
         Product foundProductBeforeUpdate = productService.getProductById(createProductResponse.getId());
         assertEquals(3, foundProductBeforeUpdate.getQuantity());
-        assertEquals(new BigDecimal("40.00"), foundProductBeforeUpdate.getPrice());
+        assertEquals(new BigDecimal("40.00"), foundProductBeforeUpdate.getUnitPrice());
         UpdateProductRequest updateProductRequest = new UpdateProductRequest();
         updateProductRequest.setProductName("MILK");
         updateProductRequest.setQuantity(5);
@@ -92,7 +92,7 @@ class ProductServiceImplTest {
         productService.updateProduct(updateProductRequest);
         Product foundProductAfterUpdate = productService.getProductById(createProductResponse.getId());
         assertEquals(5, foundProductAfterUpdate.getQuantity());
-        assertEquals(new BigDecimal("10.00"), foundProductAfterUpdate.getPrice());
+        assertEquals(new BigDecimal("10.00"), foundProductAfterUpdate.getUnitPrice());
 
     }
     @Test

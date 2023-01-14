@@ -41,7 +41,7 @@ public class User {
     @JoinColumn(name = "Address_id")
     private Address address;
 //    @OneToMany
-//    private List<PurchaseHistory>purchaseHistories;
+//    private List<OrderHistory>purchaseHistories;
     @CreationTimestamp
     @Column(name = "created_time")
     private Instant createdTime = Instant.now();

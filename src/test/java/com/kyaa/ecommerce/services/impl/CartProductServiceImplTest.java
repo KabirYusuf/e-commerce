@@ -35,6 +35,7 @@ class CartProductServiceImplTest {
         cartProductTwo = new CartProduct();
         cartProductTwo.setName("milo");
         cartProductTwo.setQuantity(5);
+        cartProductTwo.setUnitPrice(BigDecimal.valueOf(10));
         cartProductTwo.setTotalPrice(BigDecimal.valueOf(34));
         cartProductTwo.setCategory(Category.BEVERAGES);
     }
