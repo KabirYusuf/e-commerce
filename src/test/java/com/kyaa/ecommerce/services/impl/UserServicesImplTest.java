@@ -109,7 +109,10 @@ private CreateUserResponse createUserResponse;
         createUserResponse = userService.createUser(createUserRequest);
         Optional<User> foundUserBeforeUpdate = userService.getUserByUsername("kyaa");
         assertEquals(USER, foundUserBeforeUpdate.get().getRole());
-        userService.updateUserRole("kyaa", ADMIN);
+        UpdateUserRoleRequest updateUserRoleRequest = new UpdateUserRoleRequest();
+        updateUserRoleRequest.setUsername(foundUserBeforeUpdate.get().getUsername());
+        updateUserRoleRequest.setRole(ADMIN);
+        userService.updateUserRole(updateUserRoleRequest);
         Optional<User> foundUserAfterUpdate = userService.getUserByUsername("kyaa");
         assertEquals(ADMIN, foundUserAfterUpdate.get().getRole());
     }

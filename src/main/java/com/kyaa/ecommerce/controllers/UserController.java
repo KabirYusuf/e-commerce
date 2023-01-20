@@ -1,10 +1,7 @@
 package com.kyaa.ecommerce.controllers;
 
 import com.kyaa.ecommerce.data.models.User;
-import com.kyaa.ecommerce.dto.requests.AddProductToCartRequest;
-import com.kyaa.ecommerce.dto.requests.CreateUserRequest;
-import com.kyaa.ecommerce.dto.requests.OrderProductRequest;
-import com.kyaa.ecommerce.dto.requests.UpdateUserRequest;
+import com.kyaa.ecommerce.dto.requests.*;
 import com.kyaa.ecommerce.dto.responses.AddProductToCartResponse;
 import com.kyaa.ecommerce.dto.responses.CreateUserResponse;
 import com.kyaa.ecommerce.dto.responses.OrderProductResponse;
@@ -41,11 +38,11 @@ public class UserController {
     public ResponseEntity<List<User>> getAllUsers(){
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
-    @PutMapping("/update-user-role/{username}")
-    public String changeUserRole(@PathVariable("username") String username,@RequestBody Role role){
-        userService.updateUserRole(username, role);
+    @PutMapping("/update-user-role")
+    public String changeUserRole(@RequestBody UpdateUserRoleRequest updateUserRoleRequest){
+        userService.updateUserRole(updateUserRoleRequest);
 //        return  new ResponseEntity<>("updated successfully", HttpStatus.OK);
-        return "success";
+        return "success updated to admin";
     }
     @PutMapping("/update-user")
     public ResponseEntity<UpdateUserResponse> updateUser(@RequestBody UpdateUserRequest updateUserRequest){

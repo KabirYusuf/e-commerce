@@ -15,7 +15,7 @@ public interface UserService {
     Optional<User> getUserByUsername(String username);
     List<User> getAllUsers();
     void deleteUserById(Long id);
-    void updateUserRole(String username, Role role);
+    void updateUserRole(UpdateUserRoleRequest updateUserRoleRequest);
 
     UpdateUserResponse updateUserInfo(UpdateUserRequest updateUserRequest);
     LoginResponse login(LoginRequest loginRequest);

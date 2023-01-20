@@ -76,9 +76,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
-    public void updateUserRole(String username, Role role) {
-        userRepository.updateUserRole(username, role );
+    public void updateUserRole(UpdateUserRoleRequest updateUserRoleRequest) {
+        userRepository.updateUserRole(updateUserRoleRequest.getUsername(), updateUserRoleRequest.getRole() );
     }
 
     @Override
