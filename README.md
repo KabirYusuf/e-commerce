@@ -14,9 +14,16 @@ Getting Started
 To run this project, follow these steps:
 
 Clone the repository: git clone https://github.com/KabirYusuf/e-commerce.git
-Navigate to the project directory: cd e-commerce
-Build the project using Maven: mvn clean install
-Run the project: mvn spring-boot:run
+Navigate to the project directory:
+cd e-commerce
+
+Build the project using Maven:
+mvn clean install
+
+Run the project:
+
+mvn spring-boot:run
+
 Access the site in your browser at http://localhost:8080
 
 Technology Stack
